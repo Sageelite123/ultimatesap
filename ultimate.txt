@@ -1,0 +1,63 @@
+Sub ULTIMATE()
+Dim J As Integer
+Dim sh As Worksheet
+Dim ws As Worksheet
+Dim lastsheet As Worksheet
+Dim firstsheet As Worksheet
+
+
+'Set path and filename for source files
+Path = "C:\Users\arthur.d1\Documents\SAP SAP GUI\Shortage\"
+Filename = Dir(Path & "*.XLS")
+
+'Open each source file and copy each sheet to current workbook
+Do While Filename <> ""
+    Workbooks.Open Filename:=Path & Filename, ReadOnly:=True
+    For Each Sheet In ActiveWorkbook.Sheets
+        Sheet.Copy After:=ThisWorkbook.Sheets(1)
+    Next Sheet
+    Workbooks(Filename).Close
+    Filename = Dir()
+Loop
+
+'Select and delete unwanted rows and columns from first 5 sheets
+For Each ws In ThisWorkbook.Worksheets
+    If ws.Index >= 1 And ws.Index <= 5 Then
+        ws.Select Replace:=False
+    End If
+Next ws
+Rows("1:2").Select
+Selection.Delete Shift:=xlUp
+Rows("1:6").Select
+Selection.Delete Shift:=xlUp
+Rows("2:2").Select
+Selection.Delete Shift:=xlUp
+Columns("A:A").Select
+Selection.Delete Shift:=xlToLeft
+Columns("C:E").Select
+Selection.Delete Shift:=xlToLeft
+
+'Activate the first sheet and rename it to "SHORTAGE"
+On Error Resume Next
+Sheets(1).Select
+Worksheets.Add ' add a sheet in first place
+Sheets(1).Name = "SHORTAGE"
+
+'Copy headers from second sheet to first sheet
+Sheets(2).Activate
+Range("A1").EntireRow.Select
+Selection.Copy Destination:=Sheets(1).Range("A1")
+
+'Loop through all sheets (except first two) and copy data to first sheet
+For J = 2 To Sheets.Count
+    Sheets(J).Activate 'make the sheet active
+    Range("A1").Select
+    Selection.CurrentRegion.Select 'select all cells in this sheet
+    Selection.Offset(1, 0).Resize(Selection.Rows.Count - 1).Select 'select all lines except title
+    Selection.Copy Destination:=Sheets(1).Range("A65536").End(xlUp)(2) 'copy cells selected in the new sheet on last line
+Next
+
+'Copy headers from last sheet to first sheet
+Set lastsheet = ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.Count)
+Set firstsheet = ThisWorkbook.Worksheets(1)
+lastsheet.Rows(1).Copy Destination:=firstsheet.Range("A1")
