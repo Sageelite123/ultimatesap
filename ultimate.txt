@@ -1,3 +1,32 @@
+Option Explicit
+
+Public SapGuiAuto, WScript, msgcol
+Public objGui As GuiApplication
+Public objConn As GuiConnection
+Public session As GuiSession
+
+Sub SAPDownloadAttachment()
+
+    Set SapGuiAuto = GetObject("SAPGUI")
+    Set objGui = SapGuiAuto.GetScriptingEngine
+    Set objConn = objGui.Children(0)
+    Set session = objConn.Children(0)
+
+    session.findById("wnd[0]").resizeWorkingPane 212, 36, False
+    session.findById("wnd[0]/usr/cntlIMAGE_CONTAINER/shellcont/shell/shellcont[0]/shell").doubleClickNode "F00027"
+    session.findById("wnd[0]/usr/ctxtPA_WERKS").text = "p81a"
+    session.findById("wnd[0]/usr/ctxtSO_MATNR-LOW").setFocus
+    session.findById("wnd[0]/usr/ctxtSO_MATNR-LOW").caretPosition = 0
+    session.findById("wnd[0]/usr/btn%_SO_MATNR_%_APP_%-VALU_PUSH").press
+    session.findById("wnd[1]").sendVKey 23
+    session.findById("wnd[2]/usr/ctxtDY_PATH").text = "C:\Users\arthur.dl\Documents\Lucas Somang Local.19\Sap Script"
+    session.findById("wnd[2]/usr/ctxtDY_PATH").setFocus
+    session.findById("wnd[2]/usr/ctxtDY_PATH").caretPosition = 61
+    session.findById("wnd[2]").sendVKey 0
+
+End Sub
+
+
 Sub ULTIMATE()
 Dim J As Integer
 Dim sh As Worksheet
@@ -61,3 +90,5 @@ Next
 Set lastsheet = ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.Count)
 Set firstsheet = ThisWorkbook.Worksheets(1)
 lastsheet.Rows(1).Copy Destination:=firstsheet.Range("A1")
+
+End Sub
